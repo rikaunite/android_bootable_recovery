@@ -45,7 +45,7 @@ static int gShowBackButton = 0;
 
 #ifndef BOARD_LDPI_RECOVERY
   #define CHAR_WIDTH 10
-  #define CHAR_HEIGHT 18
+  #define CHAR_HEIGHT 21
 #else
   #define CHAR_WIDTH 7
   #define CHAR_HEIGHT 16
@@ -134,12 +134,11 @@ static void draw_progress_locked()
 {
     if (gProgressBarType == PROGRESSBAR_TYPE_NONE) return;
 
-    int iconHeight = gr_get_height(gBackgroundIcon[BACKGROUND_ICON_INSTALLING]);
     int width = gr_get_width(gProgressBarEmpty);
     int height = gr_get_height(gProgressBarEmpty);
 
     int dx = (gr_fb_width() - width)/2;
-    int dy = (3*gr_fb_height() + iconHeight - 2*height)/4;
+    int dy = gr_fb_height() * 5 / 6 + height * 2;
 
     // Erase behind the progress bar (in case this was a progress-only update)
     gr_color(0, 0, 0, 255);
@@ -166,13 +165,13 @@ static void draw_progress_locked()
 
 static void draw_text_line(int row, const char* t) {
   if (t[0] != '\0') {
-    gr_text(0, (row+1)*CHAR_HEIGHT-1, t);
+    gr_text(0, (row + 1) * CHAR_HEIGHT - 5, t);
   }
 }
 
-//#define MENU_TEXT_COLOR 255, 160, 49, 255
-#define MENU_TEXT_COLOR 0, 191, 255, 255
-#define NORMAL_TEXT_COLOR 200, 200, 200, 255
+#define MENU_BACKGROUND_COLOR 0, 0, 0, 127
+#define MENU_TEXT_COLOR 191, 15, 31, 223
+#define NORMAL_TEXT_COLOR 191, 191, 191, 223
 #define HEADER_TEXT_COLOR NORMAL_TEXT_COLOR
 
 // Redraw everything on the screen.  Does not flip pages.
@@ -184,7 +183,7 @@ static void draw_screen_locked(void)
     draw_progress_locked();
 
     if (show_text) {
-        gr_color(0, 0, 0, 160);
+        gr_color(MENU_BACKGROUND_COLOR);
         gr_fill(0, 0, gr_fb_width(), gr_fb_height());
 
         int i = 0;
@@ -192,14 +191,18 @@ static void draw_screen_locked(void)
         int row = 0;            // current row that we are drawing on
         if (show_menu) {
             gr_color(MENU_TEXT_COLOR);
-            gr_fill(0, (menu_top + menu_sel - menu_show_start) * CHAR_HEIGHT,
-                    gr_fb_width(), (menu_top + menu_sel - menu_show_start + 1)*CHAR_HEIGHT+1);
+            gr_fill(0, (menu_top + menu_sel - menu_show_start) * CHAR_HEIGHT - 3,
+                    gr_fb_width(), (menu_top + menu_sel - menu_show_start + 1) * CHAR_HEIGHT - 3);
 
             gr_color(HEADER_TEXT_COLOR);
             for (i = 0; i < menu_top; ++i) {
                 draw_text_line(i, menu[i]);
                 row++;
             }
+
+            gr_color(MENU_TEXT_COLOR);
+            gr_fill(0, row * CHAR_HEIGHT - CHAR_HEIGHT / 2 - 4,
+                    gr_fb_width(), row * CHAR_HEIGHT - CHAR_HEIGHT / 2 - 3);
 
             if (menu_items - menu_show_start + menu_top >= MAX_ROWS)
                 j = MAX_ROWS - menu_top;
@@ -209,7 +212,7 @@ static void draw_screen_locked(void)
             gr_color(MENU_TEXT_COLOR);
             for (i = menu_show_start + menu_top; i < (menu_show_start + menu_top + j); ++i) {
                 if (i == menu_top + menu_sel) {
-                    gr_color(255, 255, 255, 255);
+                    gr_color(NORMAL_TEXT_COLOR);
                     draw_text_line(i - menu_show_start , menu[i]);
                     gr_color(MENU_TEXT_COLOR);
                 } else {
@@ -218,12 +221,12 @@ static void draw_screen_locked(void)
                 }
                 row++;
             }
-            gr_fill(0, row*CHAR_HEIGHT+CHAR_HEIGHT/2-1,
-                    gr_fb_width(), row*CHAR_HEIGHT+CHAR_HEIGHT/2+1);
+            gr_fill(0, row * CHAR_HEIGHT + CHAR_HEIGHT / 2 - 4,
+                    gr_fb_width(), row * CHAR_HEIGHT + CHAR_HEIGHT / 2 - 3);
         }
 
         gr_color(NORMAL_TEXT_COLOR);
-        for (; row < text_rows; ++row) {
+        for (++row; row < text_rows; ++row) {
             draw_text_line(row, text[(row+text_top) % text_rows]);
         }
     }
@@ -357,7 +360,7 @@ void ui_init(void)
     ev_init();
 
     text_col = text_row = 0;
-    text_rows = gr_fb_height() / CHAR_HEIGHT;
+    text_rows = gr_fb_height() / CHAR_HEIGHT + 2;
     if (text_rows > MAX_ROWS) text_rows = MAX_ROWS;
     text_top = 1;
 

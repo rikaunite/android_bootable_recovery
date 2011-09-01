@@ -79,11 +79,11 @@ int install_zip(const char* packagefilepath)
     return 0;
 }
 
-char* INSTALL_MENU_ITEMS[] = {  "choose zip from sdcard",
-                                "apply /sdcard/update.zip",
-                                "toggle signature verification",
-                                "toggle script asserts",
-                                "choose zip from internal sdcard",
+char* INSTALL_MENU_ITEMS[] = {  "Choose Zip From SD Card",
+                                "Apply /sdcard/update.zip",
+                                "Toggle Signature Verification",
+                                "Toggle Script Asserts",
+                                "Choose Zip From Internal SD Card",
                                 NULL };
 #define ITEM_CHOOSE_ZIP       0
 #define ITEM_APPLY_SDCARD     1
@@ -644,19 +644,19 @@ void show_partition_menu()
 			Volume* v = &device_volumes[i];
 			if(strcmp("ramdisk", v->fs_type) != 0 && strcmp("mtd", v->fs_type) != 0 && strcmp("emmc", v->fs_type) != 0 && strcmp("bml", v->fs_type) != 0)
 			{
-				sprintf(&mount_menue[mountable_volumes].mount, "mount %s", v->mount_point);
-				sprintf(&mount_menue[mountable_volumes].unmount, "unmount %s", v->mount_point);
+				sprintf(&mount_menue[mountable_volumes].mount, "Mount %s", v->mount_point);
+				sprintf(&mount_menue[mountable_volumes].unmount, "Unmount %s", v->mount_point);
 				mount_menue[mountable_volumes].v = &device_volumes[i];
 				++mountable_volumes;
 				if (is_safe_to_format(v->mount_point)) {
-					sprintf(&format_menue[formatable_volumes].txt, "format %s", v->mount_point);
+					sprintf(&format_menue[formatable_volumes].txt, "Format %s", v->mount_point);
 					format_menue[formatable_volumes].v = &device_volumes[i];
 					++formatable_volumes;
 				}
 		    }
 		    else if (strcmp("ramdisk", v->fs_type) != 0 && strcmp("mtd", v->fs_type) == 0 && is_safe_to_format(v->mount_point))
 		    {
-				sprintf(&format_menue[formatable_volumes].txt, "format %s", v->mount_point);
+				sprintf(&format_menue[formatable_volumes].txt, "Format %s", v->mount_point);
 				format_menue[formatable_volumes].v = &device_volumes[i];
 				++formatable_volumes;
 			}
@@ -687,7 +687,7 @@ void show_partition_menu()
 			options[mountable_volumes+i] = e->txt;
 		}
 
-        options[mountable_volumes+formatable_volumes] = "mount USB storage";
+        options[mountable_volumes+formatable_volumes] = "Mount USB Storage";
         options[mountable_volumes+formatable_volumes + 1] = NULL;
 
         int chosen_item = get_menu_selection(headers, &options, 0, 0);
